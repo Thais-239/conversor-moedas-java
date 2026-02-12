@@ -12,12 +12,17 @@ import java.text.DecimalFormat;
 
 public class Main {
 
-    private static final String API_KEY = "3b7d35971996da066ae73cf3";
+    private static final String API_KEY = System.getenv("API_KEY");
 
     public static void main(String[] args) {
 
         Scanner scanner = new Scanner(System.in);
         int opcao = 1;
+
+        if (API_KEY == null || API_KEY.isBlank()) {
+            System.out.println("Erro: variável de ambiente API_KEY não configurada.");
+            return;
+        }
 
         while (opcao != 0) {
 
@@ -125,8 +130,14 @@ public class Main {
                     .parseString(response.body())
                     .getAsJsonObject();
 
-            double resultado = json.get("conversion_result").getAsDouble();
+            String status = json.get("result").getAsString();
 
+            if (!status.equals("success")) {
+                System.out.println("Erro na API: " + status);
+                return;
+            }
+
+            double resultado = json.get("conversion_result").getAsDouble();
 
             DecimalFormat df = new DecimalFormat("#,##0.00");
 
